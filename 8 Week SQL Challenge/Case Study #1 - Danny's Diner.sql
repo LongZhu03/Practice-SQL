@@ -53,15 +53,14 @@ JOIN dannys_diner.menu
 -- ORDER BY sales.customer_id, menu.product_name;
 
 -- 4. What is the most purchased item on the menu and how many times was it purchased by all customers?
-SELECT
+SELECT TOP 1
   product_name
   , COUNT(*) AS purchase_count
 FROM dannys_diner.sales
 INNER JOIN dannys_diner.menu
   ON sales.product_id = menu.product_id
 GROUP BY product_name
-ORDER BY purchase_count DESC
-LIMIT 1;
+ORDER BY purchase_count DESC;
 
 -- WITH item_counts AS (
 --   SELECT
@@ -221,7 +220,7 @@ SELECT
   sales.customer_id,
   SUM(
     CASE
-      WHEN order_date >= join_date AND order_date BETWEEN join_date AND join_date + 6 THEN price * 20
+      WHEN order_date >= join_date AND order_date < DATEADD(day, 7, join_date) THEN price * 20
       WHEN product_name = 'sushi' THEN price * 20
       ELSE price * 10
     END
@@ -231,7 +230,6 @@ JOIN dannys_diner.menu
   ON sales.product_id = menu.product_id
 JOIN dannys_diner.members
   ON sales.customer_id = members.customer_id
--- WHERE MONTH(order_date) = 1
-WHERE DATE_PART('month', order_date) = 1
+WHERE MONTH(order_date) = 1
 GROUP BY sales.customer_id
 ORDER BY sales.customer_id;
